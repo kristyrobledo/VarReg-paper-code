@@ -369,7 +369,7 @@ rna.best2 <- searchVarReg(y=rna$y,
 AIC from all models:
 
 ```{r}
-rna.best$AIC %>%
+rna.best2$AIC %>%
   kbl(digits=1)
 ```
 

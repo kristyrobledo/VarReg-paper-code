@@ -4,8 +4,9 @@
   - <a href="#install-packages" id="toc-install-packages">Install
     packages</a>
   - <a href="#cd4-dataset" id="toc-cd4-dataset">CD4 dataset</a>
-  - <a href="#viral-load-dataset" id="toc-viral-load-dataset">Viral load
-    dataset</a>
+  - <a href="#viral-load-dataset-censored-outcome-data"
+    id="toc-viral-load-dataset-censored-outcome-data">Viral load dataset
+    (censored outcome data)</a>
 
 # VarReg paper code
 
@@ -124,34 +125,448 @@ cd4.best <- searchVarReg(y=CD4$cd4,
 lets look at the AIC table to identify where the best model is located:
 
 ``` r
-cd4.best$AIC
+cd4.best$AIC %>%
+  kbl(digits=1)
 ```
 
-    ##              Mean_zero Mean_constant Mean_linear Mean_Knot0 Mean_Knot1
-    ## Var_constant  9750.800      9205.697    9044.145   8995.636   8997.324
-    ## Var_linear    9662.433      9157.150    8999.804   8919.514   8916.172
-    ## Var_Knot0     9554.869      9157.147    8947.772   8839.196   8834.943
-    ## Var_Knot1     9569.405      9071.485    8904.234   8843.905   8843.712
-    ## Var_Knot2     9529.277      8998.794    8897.034   8842.428   8843.873
-    ## Var_Knot3     9524.547      8989.098    8892.297   8845.462   8847.495
-    ## Var_Knot4     9526.038      8989.595    8893.074   8848.011   8849.848
-    ## Var_Knot5     9525.887      8985.381    8893.981   8849.504   8851.418
-    ## Var_Knot6     9527.429      8987.042    8895.133   8851.729   8853.584
-    ## Var_Knot7     9530.447      8988.579    8896.649   8852.372   8854.234
-    ##              Mean_Knot2 Mean_Knot3 Mean_Knot4 Mean_Knot5 Mean_Knot6 Mean_Knot7
-    ## Var_constant   8976.977   8972.057   8967.595   8966.348   8964.831   8964.573
-    ## Var_linear     8893.389   8889.809   8886.373   8885.619   8884.546   8884.719
-    ## Var_Knot0      8862.480   8890.607   8905.680   8912.820   8916.547   8920.788
-    ## Var_Knot1      8827.579   8825.414   8823.567   8823.251   8822.785   8823.612
-    ## Var_Knot2      8810.478   8804.045   8799.112   8797.778   8797.272   8798.476
-    ## Var_Knot3      8809.034   8802.154   8797.212   8796.155   8795.645   8796.823
-    ## Var_Knot4      8813.236   8805.825   8801.343   8800.640   8800.177   8801.278
-    ## Var_Knot5      8809.139   8803.708   8800.016   8799.135   8798.866   8800.097
-    ## Var_Knot6      8810.938   8804.912   8801.297   8800.626   8800.376   8801.441
-    ## Var_Knot7      8813.169   8807.877   8804.331   8803.412   8803.204   8804.441
+<table>
+<thead>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:right;">
+Mean_zero
+</th>
+<th style="text-align:right;">
+Mean_constant
+</th>
+<th style="text-align:right;">
+Mean_linear
+</th>
+<th style="text-align:right;">
+Mean_Knot0
+</th>
+<th style="text-align:right;">
+Mean_Knot1
+</th>
+<th style="text-align:right;">
+Mean_Knot2
+</th>
+<th style="text-align:right;">
+Mean_Knot3
+</th>
+<th style="text-align:right;">
+Mean_Knot4
+</th>
+<th style="text-align:right;">
+Mean_Knot5
+</th>
+<th style="text-align:right;">
+Mean_Knot6
+</th>
+<th style="text-align:right;">
+Mean_Knot7
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Var_constant
+</td>
+<td style="text-align:right;">
+9750.8
+</td>
+<td style="text-align:right;">
+9205.7
+</td>
+<td style="text-align:right;">
+9044.1
+</td>
+<td style="text-align:right;">
+8995.6
+</td>
+<td style="text-align:right;">
+8997.3
+</td>
+<td style="text-align:right;">
+8977.0
+</td>
+<td style="text-align:right;">
+8972.1
+</td>
+<td style="text-align:right;">
+8967.6
+</td>
+<td style="text-align:right;">
+8966.3
+</td>
+<td style="text-align:right;">
+8964.8
+</td>
+<td style="text-align:right;">
+8964.6
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Var_linear
+</td>
+<td style="text-align:right;">
+9662.4
+</td>
+<td style="text-align:right;">
+9157.1
+</td>
+<td style="text-align:right;">
+8999.8
+</td>
+<td style="text-align:right;">
+8919.5
+</td>
+<td style="text-align:right;">
+8916.2
+</td>
+<td style="text-align:right;">
+8893.4
+</td>
+<td style="text-align:right;">
+8889.8
+</td>
+<td style="text-align:right;">
+8886.4
+</td>
+<td style="text-align:right;">
+8885.6
+</td>
+<td style="text-align:right;">
+8884.5
+</td>
+<td style="text-align:right;">
+8884.7
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Var_Knot0
+</td>
+<td style="text-align:right;">
+9554.9
+</td>
+<td style="text-align:right;">
+9157.1
+</td>
+<td style="text-align:right;">
+8947.8
+</td>
+<td style="text-align:right;">
+8839.2
+</td>
+<td style="text-align:right;">
+8834.9
+</td>
+<td style="text-align:right;">
+8862.5
+</td>
+<td style="text-align:right;">
+8890.6
+</td>
+<td style="text-align:right;">
+8905.7
+</td>
+<td style="text-align:right;">
+8912.8
+</td>
+<td style="text-align:right;">
+8916.5
+</td>
+<td style="text-align:right;">
+8920.8
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Var_Knot1
+</td>
+<td style="text-align:right;">
+9569.4
+</td>
+<td style="text-align:right;">
+9071.5
+</td>
+<td style="text-align:right;">
+8904.2
+</td>
+<td style="text-align:right;">
+8843.9
+</td>
+<td style="text-align:right;">
+8843.7
+</td>
+<td style="text-align:right;">
+8827.6
+</td>
+<td style="text-align:right;">
+8825.4
+</td>
+<td style="text-align:right;">
+8823.6
+</td>
+<td style="text-align:right;">
+8823.3
+</td>
+<td style="text-align:right;">
+8822.8
+</td>
+<td style="text-align:right;">
+8823.6
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Var_Knot2
+</td>
+<td style="text-align:right;">
+9529.3
+</td>
+<td style="text-align:right;">
+8998.8
+</td>
+<td style="text-align:right;">
+8897.0
+</td>
+<td style="text-align:right;">
+8842.4
+</td>
+<td style="text-align:right;">
+8843.9
+</td>
+<td style="text-align:right;">
+8810.5
+</td>
+<td style="text-align:right;">
+8804.0
+</td>
+<td style="text-align:right;">
+8799.1
+</td>
+<td style="text-align:right;">
+8797.8
+</td>
+<td style="text-align:right;">
+8797.3
+</td>
+<td style="text-align:right;">
+8798.5
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Var_Knot3
+</td>
+<td style="text-align:right;">
+9524.5
+</td>
+<td style="text-align:right;">
+8989.1
+</td>
+<td style="text-align:right;">
+8892.3
+</td>
+<td style="text-align:right;">
+8845.5
+</td>
+<td style="text-align:right;">
+8847.5
+</td>
+<td style="text-align:right;">
+8809.0
+</td>
+<td style="text-align:right;">
+8802.2
+</td>
+<td style="text-align:right;">
+8797.2
+</td>
+<td style="text-align:right;">
+8796.2
+</td>
+<td style="text-align:right;">
+8795.6
+</td>
+<td style="text-align:right;">
+8796.8
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Var_Knot4
+</td>
+<td style="text-align:right;">
+9526.0
+</td>
+<td style="text-align:right;">
+8989.6
+</td>
+<td style="text-align:right;">
+8893.1
+</td>
+<td style="text-align:right;">
+8848.0
+</td>
+<td style="text-align:right;">
+8849.8
+</td>
+<td style="text-align:right;">
+8813.2
+</td>
+<td style="text-align:right;">
+8805.8
+</td>
+<td style="text-align:right;">
+8801.3
+</td>
+<td style="text-align:right;">
+8800.6
+</td>
+<td style="text-align:right;">
+8800.2
+</td>
+<td style="text-align:right;">
+8801.3
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Var_Knot5
+</td>
+<td style="text-align:right;">
+9525.9
+</td>
+<td style="text-align:right;">
+8985.4
+</td>
+<td style="text-align:right;">
+8894.0
+</td>
+<td style="text-align:right;">
+8849.5
+</td>
+<td style="text-align:right;">
+8851.4
+</td>
+<td style="text-align:right;">
+8809.1
+</td>
+<td style="text-align:right;">
+8803.7
+</td>
+<td style="text-align:right;">
+8800.0
+</td>
+<td style="text-align:right;">
+8799.1
+</td>
+<td style="text-align:right;">
+8798.9
+</td>
+<td style="text-align:right;">
+8800.1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Var_Knot6
+</td>
+<td style="text-align:right;">
+9527.4
+</td>
+<td style="text-align:right;">
+8987.0
+</td>
+<td style="text-align:right;">
+8895.1
+</td>
+<td style="text-align:right;">
+8851.7
+</td>
+<td style="text-align:right;">
+8853.6
+</td>
+<td style="text-align:right;">
+8810.9
+</td>
+<td style="text-align:right;">
+8804.9
+</td>
+<td style="text-align:right;">
+8801.3
+</td>
+<td style="text-align:right;">
+8800.6
+</td>
+<td style="text-align:right;">
+8800.4
+</td>
+<td style="text-align:right;">
+8801.4
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Var_Knot7
+</td>
+<td style="text-align:right;">
+9530.4
+</td>
+<td style="text-align:right;">
+8988.6
+</td>
+<td style="text-align:right;">
+8896.6
+</td>
+<td style="text-align:right;">
+8852.4
+</td>
+<td style="text-align:right;">
+8854.2
+</td>
+<td style="text-align:right;">
+8813.2
+</td>
+<td style="text-align:right;">
+8807.9
+</td>
+<td style="text-align:right;">
+8804.3
+</td>
+<td style="text-align:right;">
+8803.4
+</td>
+<td style="text-align:right;">
+8803.2
+</td>
+<td style="text-align:right;">
+8804.4
+</td>
+</tr>
+</tbody>
+</table>
 
 The best model is saved within the `cd4.best` list. The key estimates
 from the best model are:
+
+``` r
+cd4.best$best.model$knots.m
+```
+
+    ## [1] 6
+
+``` r
+cd4.best$best.model$knots.v
+```
+
+    ## [1] 3
 
 ``` r
 cd4.best$best.model$mean
@@ -169,7 +584,8 @@ cd4.best$best.model$variance
     ##    Intercept V_Knt3_Base1 V_Knt3_Base2 V_Knt3_Base3 V_Knt3_Base4 V_Knt3_Base5 
     ##   40801.4581  411830.6370  109290.5901    2784.9777     914.4245  -25616.3670
 
-We can then plot this best model:
+ie. 6 knots in mean and 3 in variance, with parameter estimates as
+given. We can then plot this best model:
 
 ``` r
 plotVarReg(cd4.best$best.model, 
@@ -337,7 +753,7 @@ mtext('C', side=3, line=2, at=0, adj=3)
 
 ![](readme_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
 
-## Viral load dataset
+## Viral load dataset (censored outcome data)
 
 This is a dataset of the HIV viral load (blood concentration of HIV RNA
 on a log10 scale) measured in 257 participants. Prior to commencing a
@@ -379,7 +795,7 @@ AIC from all models:
 
 ``` r
 rna.best$AIC %>%
-  kbl()
+  kbl(digits=1)
 ```
 
 <table>
@@ -422,31 +838,31 @@ Mean_Knot5
 Var_constant
 </td>
 <td style="text-align:right;">
-356.5785
+356.6
 </td>
 <td style="text-align:right;">
-358.5707
+358.6
 </td>
 <td style="text-align:right;">
-360.6546
+360.7
 </td>
 <td style="text-align:right;">
-362.3714
+362.4
 </td>
 <td style="text-align:right;">
-364.4168
+364.4
 </td>
 <td style="text-align:right;">
-366.8289
+366.8
 </td>
 <td style="text-align:right;">
-367.6413
+367.6
 </td>
 <td style="text-align:right;">
-367.9895
+368.0
 </td>
 <td style="text-align:right;">
-370.2163
+370.2
 </td>
 </tr>
 <tr>
@@ -454,31 +870,31 @@ Var_constant
 Var_linear
 </td>
 <td style="text-align:right;">
-343.7177
+343.7
 </td>
 <td style="text-align:right;">
-344.9826
+345.0
 </td>
 <td style="text-align:right;">
-346.5864
+346.6
 </td>
 <td style="text-align:right;">
-343.8347
+343.8
 </td>
 <td style="text-align:right;">
-346.0263
+346.0
 </td>
 <td style="text-align:right;">
-346.8374
+346.8
 </td>
 <td style="text-align:right;">
-348.1985
+348.2
 </td>
 <td style="text-align:right;">
-349.6518
+349.7
 </td>
 <td style="text-align:right;">
-351.8708
+351.9
 </td>
 </tr>
 <tr>
@@ -486,31 +902,31 @@ Var_linear
 Var_Knot0
 </td>
 <td style="text-align:right;">
-308.8055
+308.8
 </td>
 <td style="text-align:right;">
-310.4113
+310.4
 </td>
 <td style="text-align:right;">
-312.4006
+312.4
 </td>
 <td style="text-align:right;">
-313.9760
+314.0
 </td>
 <td style="text-align:right;">
-314.7392
+314.7
 </td>
 <td style="text-align:right;">
-316.4534
+316.5
 </td>
 <td style="text-align:right;">
-318.5436
+318.5
 </td>
 <td style="text-align:right;">
-319.1087
+319.1
 </td>
 <td style="text-align:right;">
-321.1579
+321.2
 </td>
 </tr>
 <tr>
@@ -518,31 +934,31 @@ Var_Knot0
 Var_Knot1
 </td>
 <td style="text-align:right;">
-301.4472
+301.4
 </td>
 <td style="text-align:right;">
-303.0993
+303.1
 </td>
 <td style="text-align:right;">
-305.0089
+305.0
 </td>
 <td style="text-align:right;">
-306.8271
+306.8
 </td>
 <td style="text-align:right;">
-307.8614
+307.9
 </td>
 <td style="text-align:right;">
-309.2471
+309.2
 </td>
 <td style="text-align:right;">
-311.4720
+311.5
 </td>
 <td style="text-align:right;">
-311.7593
+311.8
 </td>
 <td style="text-align:right;">
-313.6094
+313.6
 </td>
 </tr>
 <tr>
@@ -550,31 +966,31 @@ Var_Knot1
 Var_Knot2
 </td>
 <td style="text-align:right;">
-300.1673
+300.2
 </td>
 <td style="text-align:right;">
-301.7458
+301.7
 </td>
 <td style="text-align:right;">
-303.7286
+303.7
 </td>
 <td style="text-align:right;">
-305.3120
+305.3
 </td>
 <td style="text-align:right;">
-306.4286
+306.4
 </td>
 <td style="text-align:right;">
-307.9999
+308.0
 </td>
 <td style="text-align:right;">
-310.1779
+310.2
 </td>
 <td style="text-align:right;">
-310.2592
+310.3
 </td>
 <td style="text-align:right;">
-312.2001
+312.2
 </td>
 </tr>
 <tr>
@@ -582,31 +998,31 @@ Var_Knot2
 Var_Knot3
 </td>
 <td style="text-align:right;">
-300.9149
+300.9
 </td>
 <td style="text-align:right;">
-302.5506
+302.6
 </td>
 <td style="text-align:right;">
-304.5162
+304.5
 </td>
 <td style="text-align:right;">
-306.0208
+306.0
 </td>
 <td style="text-align:right;">
-307.1521
+307.2
 </td>
 <td style="text-align:right;">
-308.7526
+308.8
 </td>
 <td style="text-align:right;">
-310.9145
+310.9
 </td>
 <td style="text-align:right;">
-310.9542
+311.0
 </td>
 <td style="text-align:right;">
-312.9245
+312.9
 </td>
 </tr>
 <tr>
@@ -614,31 +1030,31 @@ Var_Knot3
 Var_Knot4
 </td>
 <td style="text-align:right;">
-302.4560
+302.5
 </td>
 <td style="text-align:right;">
-304.1922
+304.2
 </td>
 <td style="text-align:right;">
-306.0404
+306.0
 </td>
 <td style="text-align:right;">
-307.6574
+307.7
 </td>
 <td style="text-align:right;">
-308.7030
+308.7
 </td>
 <td style="text-align:right;">
-310.1801
+310.2
 </td>
 <td style="text-align:right;">
-312.3732
+312.4
 </td>
 <td style="text-align:right;">
-312.4624
+312.5
 </td>
 <td style="text-align:right;">
-314.4230
+314.4
 </td>
 </tr>
 <tr>
@@ -646,31 +1062,31 @@ Var_Knot4
 Var_Knot5
 </td>
 <td style="text-align:right;">
-301.8835
+301.9
 </td>
 <td style="text-align:right;">
-303.5299
+303.5
 </td>
 <td style="text-align:right;">
-305.4762
+305.5
 </td>
 <td style="text-align:right;">
-306.8321
+306.8
 </td>
 <td style="text-align:right;">
-307.9106
+307.9
 </td>
 <td style="text-align:right;">
-309.6258
+309.6
 </td>
 <td style="text-align:right;">
-311.7526
+311.8
 </td>
 <td style="text-align:right;">
-312.0656
+312.1
 </td>
 <td style="text-align:right;">
-313.7795
+313.8
 </td>
 </tr>
 </tbody>
@@ -699,27 +1115,303 @@ rna.best2 <- searchVarReg(y=rna$y,
 AIC from all models:
 
 ``` r
-rna.best$AIC
+rna.best2$AIC %>%
+  kbl(digits=1)
 ```
 
-    ##              Mean_zero Mean_constant Mean_linear Mean_Knot0 Mean_Knot1
-    ## Var_constant  356.5785      358.5707    360.6546   362.3714   364.4168
-    ## Var_linear    343.7177      344.9826    346.5864   343.8347   346.0263
-    ## Var_Knot0     308.8055      310.4113    312.4006   313.9760   314.7392
-    ## Var_Knot1     301.4472      303.0993    305.0089   306.8271   307.8614
-    ## Var_Knot2     300.1673      301.7458    303.7286   305.3120   306.4286
-    ## Var_Knot3     300.9149      302.5506    304.5162   306.0208   307.1521
-    ## Var_Knot4     302.4560      304.1922    306.0404   307.6574   308.7030
-    ## Var_Knot5     301.8835      303.5299    305.4762   306.8321   307.9106
-    ##              Mean_Knot2 Mean_Knot3 Mean_Knot4 Mean_Knot5
-    ## Var_constant   366.8289   367.6413   367.9895   370.2163
-    ## Var_linear     346.8374   348.1985   349.6518   351.8708
-    ## Var_Knot0      316.4534   318.5436   319.1087   321.1579
-    ## Var_Knot1      309.2471   311.4720   311.7593   313.6094
-    ## Var_Knot2      307.9999   310.1779   310.2592   312.2001
-    ## Var_Knot3      308.7526   310.9145   310.9542   312.9245
-    ## Var_Knot4      310.1801   312.3732   312.4624   314.4230
-    ## Var_Knot5      309.6258   311.7526   312.0656   313.7795
+<table>
+<thead>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:right;">
+Mean_zero
+</th>
+<th style="text-align:right;">
+Mean_constant
+</th>
+<th style="text-align:right;">
+Mean_linear
+</th>
+<th style="text-align:right;">
+Mean_Knot0
+</th>
+<th style="text-align:right;">
+Mean_Knot1
+</th>
+<th style="text-align:right;">
+Mean_Knot2
+</th>
+<th style="text-align:right;">
+Mean_Knot3
+</th>
+<th style="text-align:right;">
+Mean_Knot4
+</th>
+<th style="text-align:right;">
+Mean_Knot5
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Var_constant
+</td>
+<td style="text-align:right;">
+356.6
+</td>
+<td style="text-align:right;">
+358.6
+</td>
+<td style="text-align:right;">
+360.7
+</td>
+<td style="text-align:right;">
+362.4
+</td>
+<td style="text-align:right;">
+364.4
+</td>
+<td style="text-align:right;">
+366.8
+</td>
+<td style="text-align:right;">
+367.6
+</td>
+<td style="text-align:right;">
+368.0
+</td>
+<td style="text-align:right;">
+370.2
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Var_linear
+</td>
+<td style="text-align:right;">
+343.7
+</td>
+<td style="text-align:right;">
+345.0
+</td>
+<td style="text-align:right;">
+346.6
+</td>
+<td style="text-align:right;">
+343.8
+</td>
+<td style="text-align:right;">
+346.0
+</td>
+<td style="text-align:right;">
+346.8
+</td>
+<td style="text-align:right;">
+348.2
+</td>
+<td style="text-align:right;">
+349.7
+</td>
+<td style="text-align:right;">
+351.9
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Var_Knot0
+</td>
+<td style="text-align:right;">
+364.6
+</td>
+<td style="text-align:right;">
+366.1
+</td>
+<td style="text-align:right;">
+368.0
+</td>
+<td style="text-align:right;">
+365.0
+</td>
+<td style="text-align:right;">
+367.1
+</td>
+<td style="text-align:right;">
+368.3
+</td>
+<td style="text-align:right;">
+369.6
+</td>
+<td style="text-align:right;">
+371.0
+</td>
+<td style="text-align:right;">
+373.2
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Var_Knot1
+</td>
+<td style="text-align:right;">
+323.2
+</td>
+<td style="text-align:right;">
+325.1
+</td>
+<td style="text-align:right;">
+327.0
+</td>
+<td style="text-align:right;">
+327.6
+</td>
+<td style="text-align:right;">
+329.2
+</td>
+<td style="text-align:right;">
+330.9
+</td>
+<td style="text-align:right;">
+333.1
+</td>
+<td style="text-align:right;">
+332.9
+</td>
+<td style="text-align:right;">
+334.4
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Var_Knot2
+</td>
+<td style="text-align:right;">
+299.4
+</td>
+<td style="text-align:right;">
+300.7
+</td>
+<td style="text-align:right;">
+302.6
+</td>
+<td style="text-align:right;">
+303.1
+</td>
+<td style="text-align:right;">
+304.2
+</td>
+<td style="text-align:right;">
+306.1
+</td>
+<td style="text-align:right;">
+308.1
+</td>
+<td style="text-align:right;">
+308.1
+</td>
+<td style="text-align:right;">
+309.9
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Var_Knot3
+</td>
+<td style="text-align:right;">
+299.9
+</td>
+<td style="text-align:right;">
+301.3
+</td>
+<td style="text-align:right;">
+303.2
+</td>
+<td style="text-align:right;">
+303.6
+</td>
+<td style="text-align:right;">
+304.8
+</td>
+<td style="text-align:right;">
+306.6
+</td>
+<td style="text-align:right;">
+308.6
+</td>
+<td style="text-align:right;">
+308.6
+</td>
+<td style="text-align:right;">
+310.2
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Var_Knot4
+</td>
+<td style="text-align:right;">
+300.4
+</td>
+<td style="text-align:right;">
+302.0
+</td>
+<td style="text-align:right;">
+303.8
+</td>
+<td style="text-align:right;">
+304.0
+</td>
+<td style="text-align:right;">
+304.8
+</td>
+<td style="text-align:right;">
+306.5
+</td>
+<td style="text-align:right;">
+308.7
+</td>
+<td style="text-align:right;">
+308.7
+</td>
+<td style="text-align:right;">
+310.7
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Var_Knot5
+</td>
+<td style="text-align:right;">
+301.5
+</td>
+<td style="text-align:right;">
+303.0
+</td>
+<td style="text-align:right;">
+304.9
+</td>
+<td style="text-align:right;">
+304.7
+</td>
+<td style="text-align:right;">
+305.7
+</td>
+<td style="text-align:right;">
+307.7
+</td>
+<td style="text-align:right;">
+309.7
+</td>
+<td style="text-align:right;">
+310.4
+</td>
+<td style="text-align:right;">
+311.9
+</td>
+</tr>
+</tbody>
+</table>
 
 Smallest AIC:
 
