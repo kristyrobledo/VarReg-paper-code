@@ -27,6 +27,100 @@ library(kableExtra)
 rna<-read.csv(file="rna.csv") #load rna dataset
 ```
 
+## Simple instability example
+
+```{r}
+load("gamlss.error4.Rdata") #  load the gamlss error data
+
+# the data were simulated from a mean 0, linear variance model (variance=0+x)
+y<-gamlss.error4[,1]
+x<-gamlss.error4[,2]
+
+# plot
+plot(x,y, ylim=c(-4,4), pch=20)
+abline(h=0, lty="dashed")
+
+```
+
+Setup link function for gamlss model to model variance
+
+```{r}
+# specify own link function as the square function for the sigma parameter 
+# (sigma^2)
+own.linkfun<-function(mu) mu^2
+own.linkinv<-function(eta) eta^(1/2)
+own.mu.eta<-function (eta) (1/2)*eta^(-1/2)
+own.valideta<-function (eta) all(eta >= 0)
+```
+
+Try fitting gamlss model:
+```{r, error=TRUE}
+gamlssfit<-gamlss(y~-1,
+                sigma.formula=~x,
+                family=NO(sigma.link="own"))
+```
+
+fails, try starting point and include traces
+
+```{r, error=TRUE}
+gamlssfit<-gamlss(y~-1,
+                sigma.formula=~x,
+                family=NO(sigma.link="own"),
+                sigma.start=c(1,1),
+                control=gamlss.control(trace=TRUE),
+                i.control=glim.control(glm.trace=TRUE))
+```
+
+still fails, try smaller step size
+
+```{r, error=TRUE}
+gamlssfit<-gamlss(y~-1,
+                sigma.formula=~x,
+                family=NO(sigma.link="own"),
+                sigma.start=c(1,1),
+                control=gamlss.control(trace=TRUE,sigma.step=0.01),
+                i.control=glim.control(glm.trace=TRUE))
+```
+
+step reduction doesn't work, try step halving
+
+```{r, error=TRUE}
+gamlssfit<-gamlss(y~-1,
+                    sigma.formula=~x,
+                    family=NO(sigma.link="own"),
+                    sigma.start=c(1,1),
+                    control=gamlss.control(trace=TRUE,sigma.step=0.5,
+                                           n.cyc = 100),
+                    i.control=glim.control(glm.trace=TRUE))
+
+```
+
+works!
+
+```{r}
+summary(gamlssfit)
+gamlssfit$aic
+logLik(gamlssfit)
+```
+
+Try VarReg:
+
+```{r}
+varreg_fit <- semiVarReg(y = y,
+                         x = x,
+                         meanmodel = "constant",
+                         varmodel = "linear",
+                         maxit = 10000)
+```
+
+```{r}
+varreg_fit$variance
+varreg_fit$aic
+varreg_fit$loglik
+varreg_fit$boundary
+```
+
+
 ## CD4 dataset
 
 This dataset is located within the `gamlss` package. CD4 is a type of white blood cell, and in this dataset, it has been measured in uninfected children born from HIV-1 infected women. The dataset contains 609 measurements of CD4 cell counts
@@ -376,4 +470,10 @@ rna.best2$AIC %>%
 Smallest AIC:
 ```{r}
 min(rna.best2$AIC)
+```
+
+# Reproducibility report
+
+```{r}
+sessionInfo()
 ```
